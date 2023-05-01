@@ -1,0 +1,48 @@
+{
+  "name": "plotly",
+  "displayName": "Plotly",
+  "description": "Plotly.js wrapper panel for Foxglove Studio",
+  "publisher": "Metaverse Industries LLC",
+  "homepage": "https://github.com/MetaverseIndustries/plotly-panel",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "./dist/extension.js",
+  "keywords": [],
+  "scripts": {
+    "build": "foxglove-extension build",
+    "foxglove:prepublish": "foxglove-extension build --mode production",
+    "lint:ci": "eslint --report-unused-disable-directives .",
+    "lint": "eslint --report-unused-disable-directives --fix .",
+    "local-install": "foxglove-extension install",
+    "package": "foxglove-extension package",
+    "pretest": "foxglove-extension pretest"
+  },
+  "devDependencies": {
+    "@foxglove/eslint-plugin": "0.21.2",
+    "@foxglove/studio": "1.52.0",
+    "@types/react": "18.2.0",
+    "@types/react-dom": "18.2.1",
+    "@types/react-plotly.js": "2.6.0",
+    "@typescript-eslint/eslint-plugin": "5.59.2",
+    "@typescript-eslint/parser": "5.59.2",
+    "create-foxglove-extension": "0.8.1",
+    "eslint": "8.39.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-es": "4.1.0",
+    "eslint-plugin-filenames": "1.3.2",
+    "eslint-plugin-import": "2.27.5",
+    "eslint-plugin-jest": "27.2.1",
+    "eslint-plugin-prettier": "4.2.1",
+    "eslint-plugin-react": "7.32.2",
+    "eslint-plugin-react-hooks": "4.6.0",
+    "prettier": "2.8.8",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "typescript": "5.0.4"
+  },
+  "dependencies": {
+    "@foxglove/rostime": "1.1.2",
+    "plotly.js": "2.22.0",
+    "react-plotly.js": "2.6.0"
+  }
+}
