@@ -2,6 +2,20 @@
 
 > _Plotly.js wrapper for Foxglove Studio_
 
+## Overview
+
+The Plotly extension panel subscribes to a topic of type `plotly.Plot` (or `plotly_msgs/Plot` for
+ROS systems) with the following message definition:
+
+```
+string data
+string layout
+```
+
+The `data` field is a JSON string holding an array of Plot.ly traces. The `layout` field is an
+optional JSON string holding the Plot.ly layout object. Both fields are described in detail on the
+[Plot.ly website](https://plotly.com/chart-studio-help/json-chart-schema/).
+
 ## Develop
 
 Run once to fetch dependencies:
