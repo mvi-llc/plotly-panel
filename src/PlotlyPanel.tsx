@@ -5,19 +5,21 @@ import { useLayoutEffect, useEffect, useState, useMemo } from "react";
 import ReactDOM from "react-dom";
 import Plot from "react-plotly.js";
 
+import {
+  PlotlyPlot,
+  PlotlyPlotParsed,
+  ParsePlotlyMessage,
+  PlotlyPlotSchemaNames,
+} from "./messages";
 import { DARK_TEMPLATE } from "./templates";
-
-type StringMessage = { data: string };
-
-const VALID_DATATYPES = new Set(["std_msgs/String", "std_msgs.String"]);
 
 function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Element {
   // Create state variables
   const [colorScheme, setColorScheme] = useState<"light" | "dark">("light");
   const [topics, setTopics] = useState<readonly Topic[] | undefined>();
   const [topicName, setTopicName] = useState<string | undefined>(getInitialTopic(context));
-  const [messages, setMessages] = useState<readonly MessageEvent<StringMessage>[] | undefined>();
-  const [latestMessage, setLatestMessage] = useState<MessageEvent<StringMessage> | undefined>();
+  const [messages, setMessages] = useState<readonly MessageEvent<PlotlyPlot>[] | undefined>();
+  const [latestMessage, setLatestMessage] = useState<MessageEvent<PlotlyPlot> | undefined>();
   const [errorMessage, setErrorMessage] = useState<string | undefined>();
   const [renderDone, setRenderDone] = useState<(() => void) | undefined>();
 
@@ -36,7 +38,7 @@ function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Eleme
       setRenderDone(() => done);
       setColorScheme(renderState.colorScheme ?? "light");
       setTopics(renderState.topics);
-      setMessages(renderState.currentFrame as readonly MessageEvent<StringMessage>[] | undefined);
+      setMessages(renderState.currentFrame as readonly MessageEvent<PlotlyPlot>[] | undefined);
     };
   }, [context]);
 
@@ -46,7 +48,7 @@ function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Eleme
       return [];
     }
     // Create a list of valid topic names that can be subscribed to
-    const output = topics.filter((t) => VALID_DATATYPES.has(t.schemaName)).map((t) => t.name);
+    const output = topics.filter((t) => PlotlyPlotSchemaNames.has(t.schemaName)).map((t) => t.name);
     // If a topic name is filled in that doesn't appear in the list, force add it to the top
     // so the setting is not lost
     if (topicName && !output.includes(topicName)) {
@@ -123,50 +125,47 @@ function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Eleme
   }, [messages, latestMessage, topicName]);
 
   // Convert the most recent message from the subscribed topic to an array of Plotly.Data objects
-  const plotData = useMemo<Plotly.Data[]>(() => {
+  const plotMessage = useMemo<PlotlyPlotParsed | undefined>(() => {
     if (!latestMessage) {
-      return [];
+      return undefined;
     }
 
     try {
       // Attempt to parse the message data as JSON
-      const json = JSON.parse(latestMessage.message.data) as unknown;
+      const parsed = ParsePlotlyMessage(latestMessage.message);
 
-      // Sanity check the JSON is an array
-      if (!Array.isArray(json)) {
-        const msg = `JSON is not an array`;
-        console.error(`[Plotly] ${msg}`);
-        setErrorMessage(msg);
-        return [];
-      }
-
-      // Clear any previous error message and blindly cast the JSON to an array of Plotly.Data
+      // Parsing succeeded, clear any previous error message
       setErrorMessage(undefined);
-      return json as Plotly.Data[];
+
+      return parsed;
     } catch (err) {
-      // If the JSON parse fails, log the error and set the error message
-      const msg = `Failed to parse JSON: ${(err as Error).message}`;
+      // The JSON parse failed, log the error and set the error message
+      const msg = `Failed to parse: ${(err as Error).message}`;
       console.error(`[Plotly] ${msg}`);
       setErrorMessage(msg);
-      return [];
+      return undefined;
     }
   }, [latestMessage]);
 
-  // Update the plot layout when the color scheme or panel title change
-  const plotLayout = useMemo<Partial<Plotly.Layout>>(() => {
-    return {
-      autosize: true,
-      template: colorScheme === "dark" ? DARK_TEMPLATE : undefined,
-    };
-  }, [colorScheme]);
+  // Extract the Plotly.Data[] array from the parsed message
+  const data = useMemo<Plotly.Data[]>(() => plotMessage?.data ?? [], [plotMessage]);
+
+  // Extract the Plotly.Layout object from the parsed message, overriding the autosize and template
+  // fields to support auto-resize and dark mode
+  const layout = useMemo<Partial<Plotly.Layout>>(() => {
+    const output: Partial<Plotly.Layout> = plotMessage?.layout ?? {};
+    output.autosize = true;
+    output.template = colorScheme === "dark" ? DARK_TEMPLATE : undefined;
+    return output;
+  }, [colorScheme, plotMessage]);
 
   // Invoke the done callback once the render is complete
   useEffect(() => renderDone?.(), [renderDone]);
 
   return (
     <Plot
-      data={plotData}
-      layout={plotLayout}
+      data={data}
+      layout={layout}
       useResizeHandler={true}
       style={{ width: "100%", height: "100%" }}
     />
