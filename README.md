@@ -2,6 +2,8 @@
 
 > _Plotly.js wrapper for Foxglove Studio_
 
+![Plotly extension panel screenshot](https://github.com/MetaverseIndustries/plotly-panel/blob/main/docs/screenshot01.png?raw=true)
+
 ## Overview
 
 The Plotly extension panel subscribes to a topic of type `plotly.Plot` (or `plotly_msgs/Plot` for
