@@ -1,5 +1,5 @@
 # Plotly Panel version history
 
-## 0.0.1
+## 1.0.0
 
-- Alpha testing
+- Initial release. Subscribe to a single `plotly.Plot` topic and deserialize data and layout JSON string fields.
