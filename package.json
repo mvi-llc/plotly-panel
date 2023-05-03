@@ -4,7 +4,7 @@
   "description": "Plotly.js wrapper panel for Foxglove Studio",
   "publisher": "Metaverse Industries LLC",
   "homepage": "https://github.com/MetaverseIndustries/plotly-panel",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "./dist/extension.js",
   "keywords": [],

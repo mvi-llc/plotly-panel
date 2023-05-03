@@ -79,7 +79,8 @@ function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Eleme
           fields: {
             topic: {
               input: "autocomplete",
-              label: "Topic (JSON)",
+              label: "Topic",
+              help: "A `plotly.Plot` message topic to subscribe to",
               items: validTopicNames,
               value: topicName,
               error: errorMessage,
