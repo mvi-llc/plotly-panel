@@ -1,4 +1,3 @@
-import { isGreaterThan } from "@foxglove/rostime";
 import { PanelExtensionContext, RenderState, Topic, MessageEvent } from "@foxglove/studio";
 import Plotly from "plotly.js";
 import { useLayoutEffect, useEffect, useState, useMemo } from "react";
@@ -115,12 +114,8 @@ function PlotlyPanel({ context }: { context: PanelExtensionContext }): JSX.Eleme
     // If no messages are available in the most recent frame, do no thing
     if (!messages || messages.length === 0) {
       return;
-    }
-
-    // If the last message in the current frame is more recent than the previous latest message,
-    // update the latest message
-    const curLatest = messages[messages.length - 1]!;
-    if (!latestMessage || isGreaterThan(curLatest.receiveTime, latestMessage.receiveTime)) {
+    } else {
+      // Set the latest message to the current message
       setLatestMessage(messages[messages.length - 1]);
     }
   }, [messages, latestMessage, topicName]);
